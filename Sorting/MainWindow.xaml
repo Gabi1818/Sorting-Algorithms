@@ -27,6 +27,10 @@
                 <ComboBoxItem Content="Selection Sort" IsSelected="True"/>
                 <ComboBoxItem Content="Bubble Sort"/>
                 <ComboBoxItem Content="Insertion Sort"/>
+                <ComboBoxItem Content="Heap Sort"/>
+                <ComboBoxItem Content="Merge Sort"/>
+                <ComboBoxItem Content="Quick Sort"/>
+                <ComboBoxItem Content="Radix Sort"/>
             </ComboBox>
             <Button Content="Sort Data" Width="150" Click="SortData_Click" Margin="5"/>
         </StackPanel>

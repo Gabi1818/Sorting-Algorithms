@@ -109,7 +109,34 @@ namespace Sorting
             }
             else
             {
-                _data.Sort();
+                string selectedAlgorithm = (AlgorithmComboBox.SelectedItem as ComboBoxItem)?.Content.ToString();
+
+                switch (selectedAlgorithm)
+                {
+                    case "Selection Sort":
+                        SelectionSort(_data);
+                        break;
+                    case "Bubble Sort":
+                        BubbleSort(_data);
+                        break;
+                    case "Insertion Sort":
+                        InsertionSort(_data);
+                        break;
+                    case "Heap Sort":
+                        HeapSort(_data);
+                        break;
+                    case "Merge Sort":
+                        MergeSort(_data);
+                        break;
+                    case "Quick Sort":
+                        QuickSort(_data);
+                        break;
+                    case "Radix Sort":
+                        RadixSort(_data);
+                        break;
+                    default:
+                        throw new Exception();
+                }
             }
 
             stopwatch.Stop();
@@ -161,23 +188,6 @@ namespace Sorting
             }
         }
 
-        private void InsertionSortTest(List<int> list)
-        {
-            int item, j;
-            for (int i = 1; i <= (list.Count - 1); i++)
-            {
-                // ulozeni prvku
-                item = list[i];
-                j = i - 1;
-                while ((j >= 0) && (list[j] > item))
-                {
-                    list[j + 1] = list[j];
-                    j--;
-                }
-                list[j + 1] = item;
-            }
-        }
-
         private void InsertionSort(List<string> data)
         {
             int n = data.Count;
@@ -195,6 +205,217 @@ namespace Sorting
                 data[j + 1] = key;
             }
         }
+
+
+        private void HeapSort(List<string> data)
+        {
+            int n = data.Count;
+
+            // Build a max heap
+            for (int i = n / 2 - 1; i >= 0; i--)
+            {
+                Heapify(data, n, i);
+            }
+
+            // Extract elements from the heap one by one
+            for (int i = n - 1; i > 0; i--)
+            {
+                // Move current root to the end
+                var temp = data[0];
+                data[0] = data[i];
+                data[i] = temp;
+
+                // Call heapify on the reduced heap
+                Heapify(data, i, 0);
+            }
+        }
+
+        private void Heapify(List<string> data, int n, int i)
+        {
+            int largest = i; // Initialize largest as root
+            int left = 2 * i + 1; // Left child index
+            int right = 2 * i + 2; // Right child index
+
+            // If left child is larger than root
+            if (left < n && string.Compare(data[left], data[largest], StringComparison.Ordinal) > 0)
+            {
+                largest = left;
+            }
+
+            // If right child is larger than the largest so far
+            if (right < n && string.Compare(data[right], data[largest], StringComparison.Ordinal) > 0)
+            {
+                largest = right;
+            }
+
+            // If largest is not root
+            if (largest != i)
+            {
+                var temp = data[i];
+                data[i] = data[largest];
+                data[largest] = temp;
+
+                // Recursively heapify the affected subtree
+                Heapify(data, n, largest);
+            }
+        }
+
+        private void MergeSort(List<string> data)
+        {
+            if (data.Count <= 1)
+            {
+                return; // Base case: a list with 0 or 1 elements is already sorted.
+            }
+
+            // Split the list into two halves
+            int mid = data.Count / 2;
+            var left = data.GetRange(0, mid);
+            var right = data.GetRange(mid, data.Count - mid);
+
+            // Recursively sort each half
+            MergeSort(left);
+            MergeSort(right);
+
+            // Merge the sorted halves
+            Merge(data, left, right);
+        }
+
+        private void Merge(List<string> data, List<string> left, List<string> right)
+        {
+            int i = 0, j = 0, k = 0;
+
+            // Compare elements from left and right lists and merge them in sorted order
+            while (i < left.Count && j < right.Count)
+            {
+                if (string.Compare(left[i], right[j], StringComparison.Ordinal) <= 0)
+                {
+                    data[k++] = left[i++];
+                }
+                else
+                {
+                    data[k++] = right[j++];
+                }
+            }
+
+            // Copy any remaining elements from the left list
+            while (i < left.Count)
+            {
+                data[k++] = left[i++];
+            }
+
+            // Copy any remaining elements from the right list
+            while (j < right.Count)
+            {
+                data[k++] = right[j++];
+            }
+        }
+
+
+
+        private void QuickSort(List<string> data)
+        {
+            QuickSort(data, 0, data.Count - 1);
+        }
+
+        private void QuickSort(List<string> data, int low, int high)
+        {
+            if (low < high)
+            {
+                // Partition the array and get the pivot index
+                int pivotIndex = Partition(data, low, high);
+
+                // Recursively sort elements before and after the pivot
+                QuickSort(data, low, pivotIndex - 1);
+                QuickSort(data, pivotIndex + 1, high);
+            }
+        }
+
+        private int Partition(List<string> data, int low, int high)
+        {
+            // Choose the last element as the pivot
+            var pivot = data[high];
+            int i = low - 1; // Index of smaller element
+
+            for (int j = low; j < high; j++)
+            {
+                // If the current element is less than or equal to the pivot
+                if (string.Compare(data[j], pivot, StringComparison.Ordinal) <= 0)
+                {
+                    i++;
+
+                    // Swap data[i] and data[j]
+                    var temp = data[i];
+                    data[i] = data[j];
+                    data[j] = temp;
+                }
+            }
+
+            // Swap data[i + 1] and data[high] (the pivot)
+            var tempPivot = data[i + 1];
+            data[i + 1] = data[high];
+            data[high] = tempPivot;
+
+            return i + 1; // Return the partitioning index
+        }
+
+        private void RadixSort(List<string> data)
+        {
+            if (data == null || data.Count <= 1)
+            {
+                return; // Base case: already sorted or empty list.
+            }
+
+            // Find the maximum length of strings in the list
+            int maxLength = data.Max(str => str.Length);
+
+            // Sort by each character position, starting from the least significant (rightmost)
+            for (int pos = maxLength - 1; pos >= 0; pos--)
+            {
+                CountingSortByCharacter(data, pos);
+            }
+        }
+
+        private void CountingSortByCharacter(List<string> data, int charPosition)
+        {
+            int n = data.Count;
+            var output = new string[n];
+            var count = new int[256]; // Assuming ASCII characters
+
+            // Initialize count array
+            for (int i = 0; i < 256; i++)
+            {
+                count[i] = 0;
+            }
+
+            // Count occurrences of characters at the specified position
+            foreach (var str in data)
+            {
+                int charIndex = charPosition < str.Length ? str[charPosition] : 0; // 0 for padding
+                count[charIndex]++;
+            }
+
+            // Update count[i] to hold the actual position of this character in output
+            for (int i = 1; i < 256; i++)
+            {
+                count[i] += count[i - 1];
+            }
+
+            // Build the output array by placing elements in sorted order
+            for (int i = n - 1; i >= 0; i--)
+            {
+                int charIndex = charPosition < data[i].Length ? data[i][charPosition] : 0; // 0 for padding
+                output[count[charIndex] - 1] = data[i];
+                count[charIndex]--;
+            }
+
+            // Copy the sorted output array back into the original list
+            for (int i = 0; i < n; i++)
+            {
+                data[i] = output[i];
+            }
+        }
+
+
 
 
 
